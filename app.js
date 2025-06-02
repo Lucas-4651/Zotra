@@ -1,0 +1,122 @@
+require('dotenv').config();
+const express = require('express');
+const path = require('path');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const { getDb } = require('./utils/db');
+const { generateCoupon } = require('./utils/helpers');
+
+const app = express();
+
+// Middlewares
+app.use(helmet());
+app.use(cookieParser());
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'votre_secret_session',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { 
+    secure: false,
+    maxAge: 24 * 60 * 60 * 1000
+  }
+}));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(express.json({ limit: '10kb' }));
+
+// Fichiers statiques
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
+
+// Routes de connexion admin
+app.get('/admin/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin', 'login.html'));
+});
+
+app.post('/admin/login', (req, res) => {
+  const { username, password } = req.body;
+  const ADMIN_PASSWORD = process.env.ADMIN_PASS || 'admin123';
+
+  if (username === 'admin' && password === ADMIN_PASSWORD) {
+    req.session.adminAuthenticated = true;
+    return res.json({ success: true });
+  }
+  res.status(401).json({ success: false, error: 'Identifiants incorrects' });
+});
+
+app.post('/admin/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).json({ error: 'Erreur de déconnexion' });
+    }
+    res.clearCookie('connect.sid');
+    res.json({ success: true });
+  });
+});
+
+// Route de réservation
+app.post('/reserver', (req, res) => {
+  const db = getDb();
+  const { nom, numero, depart, arrivee, date } = req.body;
+  
+  if (!nom || !numero || !depart || !arrivee || !date) {
+    return res.status(400).json({ error: 'Tous les champs sont obligatoires' });
+  }
+
+  const coupon = generateCoupon();
+
+  db.serialize(() => {
+    db.run(
+      `INSERT INTO reservations (nom, telephone, depart, arrivee, date) 
+       VALUES (?, ?, ?, ?, ?)`,
+      [nom, numero, depart, arrivee, date],
+      function(err) {
+        if (err) {
+          console.error('Erreur DB:', err);
+          return res.status(500).json({ error: 'Erreur base de données' });
+        }
+        
+        const reservationId = this.lastID;
+        
+        db.run(
+          `INSERT INTO transactions (reservation_id, montant, statut, coupon) 
+           VALUES (?, ?, ?, ?)`,
+          [reservationId, 5000, 'en attente', coupon],
+          function(err) {
+            if (err) {
+              console.error('Erreur transaction:', err);
+              return res.status(500).json({ error: 'Erreur création transaction' });
+            }
+            
+            res.json({ 
+              success: true,
+              message: 'Réservation enregistrée. Paiement en attente.',
+              coupon
+            });
+          }
+        );
+      }
+    );
+  });
+});
+
+// Middleware d'authentification admin
+const authAdmin = (req, res, next) => {
+  if (req.session.adminAuthenticated || req.path === '/login') {
+    return next();
+  }
+  res.redirect('/admin/login');
+};
+
+// Route admin principale
+app.get('/admin', authAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin', 'index.html'));
+});
+
+// Gestion des erreurs
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Une erreur est survenue');
+});
+
+module.exports = { app };

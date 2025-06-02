@@ -1,0 +1,15 @@
+const { app } = require('./app'); // 🧠 destructuring du bon module
+const dbModule = require('./utils/db');
+
+const PORT = process.env.PORT || 3000;
+
+dbModule.init()
+  .then(() => {
+    // db est prêt, on peut maintenant démarrer le serveur
+    app.listen(PORT, () => {
+      console.log(`✅ Serveur actif sur http://localhost:${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('Erreur d\'initialisation DB :', err);
+  });

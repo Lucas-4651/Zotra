@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard - Zotra</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <header>
+    <h1><i class="fas fa-cogs"></i> Dashboard Admin 🔥</h1>
+    <nav>
+      <a href="#reservations">Réservations</a>
+      <a href="#transactions">Transactions</a>
+      <a href="#annonces">Annonces</a>
+      <a href="#stats">Statistiques</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="reservations">
+      <h2>Réservations en attente</h2>
+      <ul id="reservation-list">
+        <!-- Les réservations s’affichent ici -->
+      </ul>
+    </section>
+
+    <section id="transactions">
+      <h2>Transactions récentes</h2>
+      <ul id="transaction-list">
+        <!-- Les transactions s’affichent ici -->
+      </ul>
+    </section>
+
+    <section id="annonces">
+      <h2><i class="fas fa-bullhorn"></i> Gestion des Annonces</h2>
+      <div class="controls">
+        <button id="add-annonce"><i class="fas fa-plus"></i> Nouvelle Annonce</button>
+      </div>
+
+      <div id="annonce-form" style="display: none;">
+        <input type="text" id="annonce-titre" placeholder="Titre" />
+        <textarea id="annonce-contenu" placeholder="Contenu..."></textarea>
+        <button id="save-annonce">Enregistrer</button>
+        <button id="cancel-annonce">Annuler</button>
+      </div>
+
+      <div id="annonces-list">
+        <!-- Les annonces seront chargées ici -->
+      </div>
+    </section>
+
+    <section id="stats">
+      <h2><i class="fas fa-chart-bar"></i> Statistiques</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="total-reservations">0</div>
+          <div class="stat-label">Réservations</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="pending-reservations">0</div>
+          <div class="stat-label">En attente</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="total-revenue">0 Ar</div>
+          <div class="stat-label">Revenu</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="active-annonces">0</div>
+          <div class="stat-label">Annonces</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="admin.js"></script>
+  <script src="admin-annonces.js"></script>
+  <script src="admin-stats.js"></script>
+</body>
+</html>

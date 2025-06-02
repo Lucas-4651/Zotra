@@ -1,0 +1,88 @@
+const reservationList = document.getElementById('reservation-list');
+const transactionList = document.getElementById('transaction-list');
+
+async function fetchReservations() {
+  const res = await fetch('/api/admin/reservations');
+  if (!res.ok) throw new Error('Erreur récupération réservations');
+  return res.json();
+}
+
+async function fetchTransactions() {
+  const res = await fetch('/api/admin/transactions');
+  if (!res.ok) throw new Error('Erreur récupération transactions');
+  return res.json();
+}
+
+async function validerReservation(id) {
+  const res = await fetch(`/api/admin/reservations/${id}/valider`, {
+    method: 'POST'
+  });
+  if (!res.ok) {
+    alert('Erreur lors de la validation');
+    return;
+  }
+  alert(`Réservation #${id} validée ✔️`);
+  refreshData();
+}
+
+async function rejeterReservation(id) {
+  const res = await fetch(`/api/admin/reservations/${id}/rejeter`, {
+    method: 'POST'
+  });
+  if (!res.ok) {
+    alert('Erreur lors du rejet');
+    return;
+  }
+  alert(`Réservation #${id} rejetée ❌`);
+  refreshData();
+}
+
+// ... (le code existant reste inchangé jusqu'à refreshData)
+
+// ... autres fonctions ...
+
+async function refreshData() {
+  try {
+    const reservations = await fetchReservations();
+    const transactions = await fetchTransactions();
+
+    reservationList.innerHTML = '';
+    reservations.forEach(r => {
+      // CORRECTION: Vérifier valide === 0 (non validé)
+      if (r.valide === 1) return;
+
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <div>
+          <strong>${r.nom}</strong> - ${r.date} 
+          <span class="status">(${r.depart} → ${r.arrivee})</span>
+        </div>
+        <div>
+          <button onclick="validerReservation(${r.id})">Valider</button>
+          <button class="reject" onclick="rejeterReservation(${r.id})">Rejeter</button>
+        </div>
+      `;
+      reservationList.appendChild(li);
+    });
+
+    transactionList.innerHTML = '';
+    transactions.forEach(t => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        #${t.id} - Réservation #${t.reservation_id}: 
+        ${t.montant} Ar - ${t.date} - <strong>${t.statut}</strong>
+      `;
+      transactionList.appendChild(li);
+    });
+
+  } catch (err) {
+    alert('Erreur lors du chargement des données: ' + err.message);
+  }
+}
+
+// Rendre les fonctions globales pour les boutons
+window.validerReservation = validerReservation;
+window.rejeterReservation = rejeterReservation;
+
+// On rafraîchit tout au chargement
+refreshData();

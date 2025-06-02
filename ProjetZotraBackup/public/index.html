@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="mg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zotra Réservation</title>
+
+  <!-- Feuille de style -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Script JS -->
+  <script defer src="main.js"></script>
+</head>
+<body>
+
+  <h1>Réservation Zotra 🚐</h1>
+
+  <form action="/reserver" method="POST">
+    <label>Anaranao :</label>
+    <input type="text" name="nom" placeholder="Rakoto..." required />
+
+    <label>Numéro Téléphone :</label>
+    <input type="tel" name="numero" placeholder="0321234567" required />
+
+    <label>Lieu de départ :</label>
+    <select name="depart" required>
+      <option value="Antalaha">Antalaha</option>
+    </select>
+
+    <label>Destination :</label>
+    <select name="arrivee" required>
+      <option value="Sambava">Sambava</option>
+    </select>
+
+    <label>Date du voyage :</label>
+    <input type="date" name="date" required />
+
+    <button type="submit">Réserver ma place</button>
+
+    <div class="note">
+      Vous recevrez un coupon après confirmation du paiement Mobile Money.
+    </div>
+  <form action="/reserver" method="POST">
+
+</body>
+</html>
