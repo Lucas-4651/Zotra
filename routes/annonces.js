@@ -15,23 +15,23 @@ router.get('/annonces', (req, res) => {
 // Créer une annonce (admin)
 router.post('/annonces', (req, res) => {
   const { titre, contenu } = req.body;
-  
+
   if (!titre || !contenu) {
     return res.status(400).json({ error: 'Titre et contenu requis' });
   }
-  
+
   const db = getDb();
   const safeTitre = sanitizeInput(titre);
   const safeContenu = sanitizeInput(contenu);
-  
+
   db.run(
     'INSERT INTO annonces (titre, contenu) VALUES (?, ?)',
     [safeTitre, safeContenu],
-    function(err) {
+    function (err) {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ 
+      res.json({
         success: true,
-        id: this.lastID 
+        id: this.lastID,
       });
     }
   );
@@ -41,15 +41,15 @@ router.post('/annonces', (req, res) => {
 router.put('/annonces/:id', (req, res) => {
   const id = req.params.id;
   const { titre, contenu } = req.body;
-  
+
   const db = getDb();
   const safeTitre = sanitizeInput(titre);
   const safeContenu = sanitizeInput(contenu);
-  
+
   db.run(
     'UPDATE annonces SET titre = ?, contenu = ? WHERE id = ?',
     [safeTitre, safeContenu, id],
-    function(err) {
+    function (err) {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ success: true });
     }
@@ -60,8 +60,8 @@ router.put('/annonces/:id', (req, res) => {
 router.delete('/annonces/:id', (req, res) => {
   const id = req.params.id;
   const db = getDb();
-  
-  db.run('DELETE FROM annonces WHERE id = ?', [id], function(err) {
+
+  db.run('DELETE FROM annonces WHERE id = ?', [id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ success: true });
   });

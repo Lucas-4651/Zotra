@@ -1,0 +1,32 @@
+// eslint.config.mjs
+import js from '@eslint/js';
+import prettier from 'eslint-config-prettier';
+
+export default [
+  js,
+  {
+    files: ['**/*.js'],
+    ignores: [
+      'node_modules/',
+      '**/*.css',
+      '**/vendor/',
+      '**/dist/',
+      '**/build/',
+    ],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'script', // Si tu utilises import/export, sinon mets 'script'
+    },
+    plugins: {
+      prettier: require('eslint-plugin-prettier'),
+    },
+    rules: {
+      // Bonnes pratiques générales
+      'no-unused-vars': 'warn',
+      'no-console': 'off',
+      // Intégration Prettier
+      'prettier/prettier': 'error',
+    },
+  },
+  prettier,
+];

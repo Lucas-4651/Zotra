@@ -22,7 +22,9 @@ form {
   margin: 1rem auto;
 }
 
-input, select, button {
+input,
+select,
+button {
   width: 100%;
   padding: 0.75rem;
   margin: 0.5rem 0;

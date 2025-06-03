@@ -7,7 +7,7 @@ async function startServer() {
   try {
     // Initialiser la base de données
     await init();
-    
+
     // Démarrer le serveur
     app.listen(PORT, () => {
       console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);

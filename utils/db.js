@@ -7,7 +7,7 @@ function init() {
   return new Promise((resolve, reject) => {
     conn = new sqlite3.Database(path.join(__dirname, '..', 'zotra.db'), (err) => {
       if (err) return reject(err);
-      
+
       conn.serialize(() => {
         conn.run(`CREATE TABLE IF NOT EXISTS reservations (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -19,7 +19,7 @@ function init() {
           valide INTEGER DEFAULT 0,
           timestamp TEXT DEFAULT CURRENT_TIMESTAMP
         )`);
-        
+
         conn.run(`CREATE TABLE IF NOT EXISTS transactions (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           reservation_id INTEGER,
@@ -29,17 +29,20 @@ function init() {
           date TEXT DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (reservation_id) REFERENCES reservations(id)
         )`);
-        
-        conn.run(`CREATE TABLE IF NOT EXISTS annonces (
+
+        conn.run(
+          `CREATE TABLE IF NOT EXISTS annonces (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           titre TEXT NOT NULL,
           contenu TEXT NOT NULL,
           date TEXT DEFAULT CURRENT_TIMESTAMP
-        )`, (err) => {
-          if (err) return reject(err);
-          console.log("📦 Base de données initialisée");
-          resolve();
-        });
+        )`,
+          (err) => {
+            if (err) return reject(err);
+            console.log('📦 Base de données initialisée');
+            resolve();
+          }
+        );
       });
     });
   });

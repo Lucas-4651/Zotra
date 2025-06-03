@@ -1,9 +1,9 @@
 // main.js
-console.log("Main.js bien chargé !");
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.querySelector("form");
+console.log('Main.js bien chargé !');
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('form');
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const nom = form.nom.value;
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const arrivee = form.arrivee.value;
     const date = form.date.value;
 
-    const coupon = "ZOTRA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const coupon = 'ZOTRA-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
     // Remplacer le contenu pour confirmation
     document.body.innerHTML = `

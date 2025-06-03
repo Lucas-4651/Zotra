@@ -34,21 +34,23 @@ app.post('/reserver', (req, res) => {
   const { nom, numero, depart, arrivee, date } = req.body;
   const coupon = genererCoupon();
 
-  db.run(`INSERT INTO reservations (nom, numero, depart, arrivee, date_voyage, code_coupon)
+  db.run(
+    `INSERT INTO reservations (nom, numero, depart, arrivee, date_voyage, code_coupon)
           VALUES (?, ?, ?, ?, ?, ?)`,
-          [nom, numero, depart, arrivee, date, coupon],
-          (err) => {
-    if (err) {
-      return res.send("Erreur dans la réservation.");
-    }
+    [nom, numero, depart, arrivee, date, coupon],
+    (err) => {
+      if (err) {
+        return res.send('Erreur dans la réservation.');
+      }
 
-    res.send(`
+      res.send(`
       <h2>Réservation enregistrée 🎉</h2>
       <p>Nom : ${nom}</p>
       <p>Coupon : <strong>${coupon}</strong></p>
       <a href="/">← Retour</a>
     `);
-  });
+    }
+  );
 });
 
 app.listen(PORT, () => {

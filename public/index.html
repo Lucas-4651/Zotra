@@ -1,168 +1,190 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zotra Réservation</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="container">
-    <header class="header">
-      <div class="logo">
-        <i class="fas fa-bus"></i>
-        <h1>Zotra<span>Voyages</span></h1>
-      </div>
-      <nav>
-        <a href="#" class="active">Accueil</a>
-        <a href="#trajets">Nos Trajets</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </header>
-
-    <main class="main-content">
-      <section class="hero">
-        <div class="hero-image">
-          <img src="https://i.imgur.com/JtQ8DkU.jpg" alt="Bus Zotra">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zotra Réservation</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="logo">
+          <i class="fas fa-bus"></i>
+          <h1>Zotra<span>Voyages</span></h1>
         </div>
-        <div class="hero-text">
-          <h2>Réservez votre voyage en toute simplicité</h2>
-          <p>Antalaha ↔ Sambava - Confort assuré</p>
-          <p class="price-mobile">Prix fixe: 5,000 Ar</p>
-        </div>
-      </section>
+        <nav>
+          <a href="#" class="active">Accueil</a>
+          <a href="#trajets">Nos Trajets</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </header>
 
-      <section class="booking-form">
-        <h3><i class="fas fa-ticket-alt"></i> Formulaire de réservation</h3>
-        <form id="reservationForm">
-          <div class="form-group">
-            <label for="nom">Nom complet</label>
-            <input type="text" id="nom" name="nom" placeholder="Votre nom" required>
+      <main class="main-content">
+        <section class="hero">
+          <div class="hero-image">
+            <img src="https://i.imgur.com/JtQ8DkU.jpg" alt="Bus Zotra" />
           </div>
-          
-          <div class="form-group">
-            <label for="numero">Numéro de téléphone</label>
-            <input type="tel" id="numero" name="numero" placeholder="032 12 345 67" required>
+          <div class="hero-text">
+            <h2>Réservez votre voyage en toute simplicité</h2>
+            <p>Antalaha ↔ Sambava - Confort assuré</p>
+            <p class="price-mobile">Prix fixe: 5,000 Ar</p>
           </div>
-          
-          <div class="form-row">
+        </section>
+
+        <section class="booking-form">
+          <h3><i class="fas fa-ticket-alt"></i> Formulaire de réservation</h3>
+          <form id="reservationForm">
             <div class="form-group">
-              <label for="depart">Lieu de départ</label>
-              <select id="depart" name="depart" required>
-                <option value="">Choisissez...</option>
-                <option value="Antalaha">Antalaha</option>
-                <option value="Sambava">Sambava</option>
-              </select>
+              <label for="nom">Nom complet</label>
+              <input
+                type="text"
+                id="nom"
+                name="nom"
+                placeholder="Votre nom"
+                required
+              />
             </div>
-            
+
             <div class="form-group">
-              <label for="arrivee">Destination</label>
-              <select id="arrivee" name="arrivee" required>
-                <option value="">Choisissez...</option>
-                <option value="Sambava">Sambava</option>
-                <option value="Antalaha">Antalaha</option>
-              </select>
+              <label for="numero">Numéro de téléphone</label>
+              <input
+                type="tel"
+                id="numero"
+                name="numero"
+                placeholder="032 12 345 67"
+                required
+              />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="depart">Lieu de départ</label>
+                <select id="depart" name="depart" required>
+                  <option value="">Choisissez...</option>
+                  <option value="Antalaha">Antalaha</option>
+                  <option value="Sambava">Sambava</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="arrivee">Destination</label>
+                <select id="arrivee" name="arrivee" required>
+                  <option value="">Choisissez...</option>
+                  <option value="Sambava">Sambava</option>
+                  <option value="Antalaha">Antalaha</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="date">Date du voyage</label>
+              <input type="date" id="date" name="date" required />
+            </div>
+
+            <button type="submit" class="submit-btn">
+              <span class="btn-text">Réserver maintenant</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </form>
+        </section>
+
+        <section id="trajets" class="trajets-section">
+          <h3><i class="fas fa-route"></i> Nos trajets réguliers</h3>
+          <div class="trajets-grid">
+            <div class="trajet-card">
+              <div class="trajet-header">
+                <h4>Antalaha → Sambava</h4>
+                <span class="price">5,000 Ar</span>
+              </div>
+              <ul class="trajet-times">
+                <li><i class="far fa-clock"></i> Départ: 06:00</li>
+                <li><i class="far fa-clock"></i> Départ: 14:00</li>
+              </ul>
+            </div>
+
+            <div class="trajet-card">
+              <div class="trajet-header">
+                <h4>Sambava → Antalaha</h4>
+                <span class="price">5,000 Ar</span>
+              </div>
+              <ul class="trajet-times">
+                <li><i class="far fa-clock"></i> Départ: 08:00</li>
+                <li><i class="far fa-clock"></i> Départ: 16:00</li>
+              </ul>
             </div>
           </div>
-          
-          <div class="form-group">
-            <label for="date">Date du voyage</label>
-            <input type="date" id="date" name="date" required>
+        </section>
+      </main>
+
+      <footer id="contact" class="footer">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h4>Contact</h4>
+            <p><i class="fas fa-phone"></i> +261 34 12 345 67</p>
+            <p><i class="fab fa-facebook"></i> Zotra Voyages</p>
           </div>
-          
-          <button type="submit" class="submit-btn">
-            <span class="btn-text">Réserver maintenant</span>
-            <i class="fas fa-arrow-right"></i>
+          <div class="footer-section">
+            <h4>Horaires</h4>
+            <p>Lundi - Dimanche: 5h00 - 20h00</p>
+          </div>
+        </div>
+        <div class="copyright">
+          © 2023 Zotra Voyages. Tous droits réservés.
+        </div>
+      </footer>
+    </div>
+
+    <!-- Popup Coupon corrigé -->
+    <div class="coupon-overlay" id="couponOverlay">
+      <div class="coupon-modal">
+        <div class="coupon-header">
+          <h3><i class="fas fa-check-circle"></i> Réservation Confirmée</h3>
+          <button class="close-btn" id="closeCoupon">&times;</button>
+        </div>
+        <div class="coupon-body">
+          <div class="coupon-code" id="couponCode">ZT-XXXXXX</div>
+
+          <div class="coupon-details">
+            <div class="detail-row">
+              <span class="detail-label">Nom:</span>
+              <span class="detail-value" id="clientName"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Trajet:</span>
+              <span class="detail-value" id="trajetDetails"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Date:</span>
+              <span class="detail-value" id="travelDate"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Montant:</span>
+              <span class="detail-value">5,000 Ar</span>
+            </div>
+          </div>
+
+          <p class="instructions">Présentez ce code au chauffeur</p>
+        </div>
+        <div class="coupon-footer">
+          <button class="btn print-btn">
+            <i class="fas fa-print"></i> Imprimer
           </button>
-        </form>
-      </section>
-
-      <section id="trajets" class="trajets-section">
-        <h3><i class="fas fa-route"></i> Nos trajets réguliers</h3>
-        <div class="trajets-grid">
-          <div class="trajet-card">
-            <div class="trajet-header">
-              <h4>Antalaha → Sambava</h4>
-              <span class="price">5,000 Ar</span>
-            </div>
-            <ul class="trajet-times">
-              <li><i class="far fa-clock"></i> Départ: 06:00</li>
-              <li><i class="far fa-clock"></i> Départ: 14:00</li>
-            </ul>
-          </div>
-          
-          <div class="trajet-card">
-            <div class="trajet-header">
-              <h4>Sambava → Antalaha</h4>
-              <span class="price">5,000 Ar</span>
-            </div>
-            <ul class="trajet-times">
-              <li><i class="far fa-clock"></i> Départ: 08:00</li>
-              <li><i class="far fa-clock"></i> Départ: 16:00</li>
-            </ul>
-          </div>
+          <button class="btn save-btn">
+            <i class="fas fa-download"></i> Sauvegarder
+          </button>
         </div>
-      </section>
-    </main>
-
-    <footer id="contact" class="footer">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h4>Contact</h4>
-          <p><i class="fas fa-phone"></i> +261 34 12 345 67</p>
-          <p><i class="fab fa-facebook"></i> Zotra Voyages</p>
-        </div>
-        <div class="footer-section">
-          <h4>Horaires</h4>
-          <p>Lundi - Dimanche: 5h00 - 20h00</p>
-        </div>
-      </div>
-      <div class="copyright">
-        © 2023 Zotra Voyages. Tous droits réservés.
-      </div>
-    </footer>
-  </div>
-
-  <!-- Popup Coupon corrigé -->
-  <div class="coupon-overlay" id="couponOverlay">
-    <div class="coupon-modal">
-      <div class="coupon-header">
-        <h3><i class="fas fa-check-circle"></i> Réservation Confirmée</h3>
-        <button class="close-btn" id="closeCoupon">&times;</button>
-      </div>
-      <div class="coupon-body">
-        <div class="coupon-code" id="couponCode">ZT-XXXXXX</div>
-        
-        <div class="coupon-details">
-          <div class="detail-row">
-            <span class="detail-label">Nom:</span>
-            <span class="detail-value" id="clientName"></span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Trajet:</span>
-            <span class="detail-value" id="trajetDetails"></span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Date:</span>
-            <span class="detail-value" id="travelDate"></span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Montant:</span>
-            <span class="detail-value">5,000 Ar</span>
-          </div>
-        </div>
-
-        <p class="instructions">Présentez ce code au chauffeur</p>
-      </div>
-      <div class="coupon-footer">
-        <button class="btn print-btn"><i class="fas fa-print"></i> Imprimer</button>
-        <button class="btn save-btn"><i class="fas fa-download"></i> Sauvegarder</button>
       </div>
     </div>
-  </div>
 
-  <script src="main.js"></script>
-</body>
+    <script src="main.js"></script>
+  </body>
 </html>

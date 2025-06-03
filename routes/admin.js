@@ -24,11 +24,11 @@ router.get('/transactions', (req, res) => {
 router.post('/reservations/:id/valider', (req, res) => {
   const id = req.params.id;
   const db = getDb();
-  
-  db.run('UPDATE reservations SET valide = 1 WHERE id = ?', [id], function(err) {
+
+  db.run('UPDATE reservations SET valide = 1 WHERE id = ?', [id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     if (this.changes === 0) return res.status(404).json({ error: 'Réservation introuvable' });
-    
+
     db.run('UPDATE transactions SET statut = ? WHERE reservation_id = ?', ['confirmée', id]);
     res.json({ success: true, message: 'Réservation validée' });
   });
@@ -38,9 +38,9 @@ router.post('/reservations/:id/valider', (req, res) => {
 router.post('/reservations/:id/rejeter', (req, res) => {
   const id = req.params.id;
   const db = getDb();
-  
+
   db.run('DELETE FROM transactions WHERE reservation_id = ?', [id], () => {
-    db.run('DELETE FROM reservations WHERE id = ?', [id], function(err) {
+    db.run('DELETE FROM reservations WHERE id = ?', [id], function (err) {
       if (err) return res.status(500).json({ error: err.message });
       if (this.changes === 0) return res.status(404).json({ error: 'Réservation introuvable' });
       res.json({ success: true, message: 'Réservation rejetée' });

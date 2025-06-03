@@ -9,26 +9,45 @@ const { generateCoupon } = require('./utils/helpers');
 
 const app = express();
 
-// Middlewares
+// --- Middleware d'authentification admin ---
+const authAdmin = (req, res, next) => {
+  // Autorise l'accès à /admin/login.html, /admin/login.js, /admin/login GET/POST
+  if (
+    req.path === '/login.html' ||
+    req.path === '/login.js' ||
+    (req.path === '/login' && (req.method === 'GET' || req.method === 'POST'))
+  ) {
+    return next();
+  }
+
+  if (req.session && req.session.adminAuthenticated) return next();
+  return res.redirect('/admin/login');
+};
+// Middlewares globaux
 app.use(helmet());
 app.use(cookieParser());
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'votre_secret_session',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { 
-    secure: false,
-    maxAge: 24 * 60 * 60 * 1000
-  }
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'votre_secret_session',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: false, // Passe à true si tu utilises HTTPS
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(express.json({ limit: '10kb' }));
 
-// Fichiers statiques
+// Fichiers statiques publics (non admin)
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
-// Routes de connexion admin
+// --- PROTECTION ADMIN ---
+// Cette ligne protège TOUT le dossier admin (dashboard, annonces, etc.)
+// sauf /admin/login et ses fichiers
+app.use('/admin', authAdmin, express.static(path.join(__dirname, 'admin')));
+// ROUTES ADMIN LOGIN
 app.get('/admin/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'login.html'));
 });
@@ -45,7 +64,7 @@ app.post('/admin/login', (req, res) => {
 });
 
 app.post('/admin/logout', (req, res) => {
-  req.session.destroy(err => {
+  req.session.destroy((err) => {
     if (err) {
       return res.status(500).json({ error: 'Erreur de déconnexion' });
     }
@@ -54,11 +73,11 @@ app.post('/admin/logout', (req, res) => {
   });
 });
 
-// Route de réservation
+// ROUTE DE RÉSERVATION (exemple, à adapter selon ton besoin)
 app.post('/reserver', (req, res) => {
   const db = getDb();
   const { nom, numero, depart, arrivee, date } = req.body;
-  
+
   if (!nom || !numero || !depart || !arrivee || !date) {
     return res.status(400).json({ error: 'Tous les champs sont obligatoires' });
   }
@@ -70,28 +89,28 @@ app.post('/reserver', (req, res) => {
       `INSERT INTO reservations (nom, telephone, depart, arrivee, date) 
        VALUES (?, ?, ?, ?, ?)`,
       [nom, numero, depart, arrivee, date],
-      function(err) {
+      function (err) {
         if (err) {
           console.error('Erreur DB:', err);
           return res.status(500).json({ error: 'Erreur base de données' });
         }
-        
+
         const reservationId = this.lastID;
-        
+
         db.run(
           `INSERT INTO transactions (reservation_id, montant, statut, coupon) 
            VALUES (?, ?, ?, ?)`,
           [reservationId, 5000, 'en attente', coupon],
-          function(err) {
+          function (err) {
             if (err) {
               console.error('Erreur transaction:', err);
               return res.status(500).json({ error: 'Erreur création transaction' });
             }
-            
-            res.json({ 
+
+            res.json({
               success: true,
               message: 'Réservation enregistrée. Paiement en attente.',
-              coupon
+              coupon,
             });
           }
         );
@@ -100,23 +119,5 @@ app.post('/reserver', (req, res) => {
   });
 });
 
-// Middleware d'authentification admin
-const authAdmin = (req, res, next) => {
-  if (req.session.adminAuthenticated || req.path === '/login') {
-    return next();
-  }
-  res.redirect('/admin/login');
-};
-
-// Route admin principale
-app.get('/admin', authAdmin, (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin', 'index.html'));
-});
-
-// Gestion des erreurs
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Une erreur est survenue');
-});
-
+// Démarrage du serveur (dans server.js d’après ton projet)
 module.exports = { app };
