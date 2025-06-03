@@ -4,14 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Zotra Réservation</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -29,6 +23,14 @@
       </header>
 
       <main class="main-content">
+
+        <!-- ANNONCES EN HAUT -->
+        <section id="annonces-section" class="annonces-section">
+          <h3><i class="fas fa-bullhorn"></i> Annonces</h3>
+          <div id="annonces-list" class="annonces-list"></div>
+        </section>
+
+        <!-- HERO -->
         <section class="hero">
           <div class="hero-image">
             <img src="https://i.imgur.com/JtQ8DkU.jpg" alt="Bus Zotra" />
@@ -40,31 +42,18 @@
           </div>
         </section>
 
+        <!-- FORMULAIRE DE RÉSERVATION -->
         <section class="booking-form">
           <h3><i class="fas fa-ticket-alt"></i> Formulaire de réservation</h3>
           <form id="reservationForm">
             <div class="form-group">
               <label for="nom">Nom complet</label>
-              <input
-                type="text"
-                id="nom"
-                name="nom"
-                placeholder="Votre nom"
-                required
-              />
+              <input type="text" id="nom" name="nom" placeholder="Votre nom" required />
             </div>
-
             <div class="form-group">
               <label for="numero">Numéro de téléphone</label>
-              <input
-                type="tel"
-                id="numero"
-                name="numero"
-                placeholder="032 12 345 67"
-                required
-              />
+              <input type="tel" id="numero" name="numero" placeholder="032 12 345 67" required />
             </div>
-
             <div class="form-row">
               <div class="form-group">
                 <label for="depart">Lieu de départ</label>
@@ -74,7 +63,6 @@
                   <option value="Sambava">Sambava</option>
                 </select>
               </div>
-
               <div class="form-group">
                 <label for="arrivee">Destination</label>
                 <select id="arrivee" name="arrivee" required>
@@ -84,12 +72,10 @@
                 </select>
               </div>
             </div>
-
             <div class="form-group">
               <label for="date">Date du voyage</label>
               <input type="date" id="date" name="date" required />
             </div>
-
             <button type="submit" class="submit-btn">
               <span class="btn-text">Réserver maintenant</span>
               <i class="fas fa-arrow-right"></i>
@@ -97,6 +83,7 @@
           </form>
         </section>
 
+        <!-- TRAJETS -->
         <section id="trajets" class="trajets-section">
           <h3><i class="fas fa-route"></i> Nos trajets réguliers</h3>
           <div class="trajets-grid">
@@ -110,7 +97,6 @@
                 <li><i class="far fa-clock"></i> Départ: 14:00</li>
               </ul>
             </div>
-
             <div class="trajet-card">
               <div class="trajet-header">
                 <h4>Sambava → Antalaha</h4>
@@ -138,7 +124,7 @@
           </div>
         </div>
         <div class="copyright">
-          © 2023 Zotra Voyages. Tous droits réservés.
+          © 2025 Lucas46 Madagascar . Tous droits réservés.
         </div>
       </footer>
     </div>
@@ -152,7 +138,6 @@
         </div>
         <div class="coupon-body">
           <div class="coupon-code" id="couponCode">ZT-XXXXXX</div>
-
           <div class="coupon-details">
             <div class="detail-row">
               <span class="detail-label">Nom:</span>
@@ -171,7 +156,6 @@
               <span class="detail-value">5,000 Ar</span>
             </div>
           </div>
-
           <p class="instructions">Présentez ce code au chauffeur</p>
         </div>
         <div class="coupon-footer">
@@ -186,5 +170,6 @@
     </div>
 
     <script src="main.js"></script>
+    <script src="annonces.js"></script>
   </body>
 </html>

@@ -1,88 +1,89 @@
-const reservationList = document.getElementById('reservation-list');
-const transactionList = document.getElementById('transaction-list');
+document.addEventListener('DOMContentLoaded', () => {
+  // Gestion de la navigation
+  const navLinks = document.querySelectorAll('nav a');
+  const contentSections = document.querySelectorAll('.content-section');
 
-async function fetchReservations() {
-  const res = await fetch('/api/admin/reservations');
-  if (!res.ok) throw new Error('Erreur récupération réservations');
-  return res.json();
-}
+  navLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
 
-async function fetchTransactions() {
-  const res = await fetch('/api/admin/transactions');
-  if (!res.ok) throw new Error('Erreur récupération transactions');
-  return res.json();
-}
+      // Mettre à jour la navigation active
+      navLinks.forEach((l) => l.parentElement.classList.remove('active'));
+      link.parentElement.classList.add('active');
 
-async function validerReservation(id) {
-  const res = await fetch(`/api/admin/reservations/${id}/valider`, {
-    method: 'POST'
+      // Afficher la section correspondante
+      const target = link.getAttribute('href').substring(1);
+      contentSections.forEach((section) => {
+        section.classList.add('hidden');
+        if (section.id === `${target}Section`) {
+          section.classList.remove('hidden');
+          document.getElementById('pageTitle').textContent = link.textContent.trim();
+          // Charge la liste des réservations à l'ouverture de l'onglet
+          if (section.id === 'reservationsSection') loadReservationList();
+        }
+      });
+    });
   });
-  if (!res.ok) {
-    alert('Erreur lors de la validation');
-    return;
-  }
-  alert(`Réservation #${id} validée ✔️`);
-  refreshData();
-}
 
-async function rejeterReservation(id) {
-  const res = await fetch(`/api/admin/reservations/${id}/rejeter`, {
-    method: 'POST'
+  // Déconnexion
+  document.querySelector('.logout-btn').addEventListener('click', () => {
+    fetch('/admin/logout', {
+      method: 'POST',
+    }).then(() => {
+      window.location.href = '/admin/login';
+    });
   });
-  if (!res.ok) {
-    alert('Erreur lors du rejet');
-    return;
-  }
-  alert(`Réservation #${id} rejetée ❌`);
-  refreshData();
-}
 
-// ... (le code existant reste inchangé jusqu'à refreshData)
+  // Charger les données initiales du dashboard principal
+  loadDashboardStats();
+});
 
-// ... autres fonctions ...
-
-async function refreshData() {
+// Fonction pour charger les stats du dashboard principal
+async function loadDashboardStats() {
   try {
-    const reservations = await fetchReservations();
-    const transactions = await fetchTransactions();
+    const [reservations, transactions] = await Promise.all([
+      fetch('/api/admin/reservations').then((r) => r.json()),
+      fetch('/api/admin/transactions').then((r) => r.json()),
+    ]);
 
-    reservationList.innerHTML = '';
-    reservations.forEach(r => {
-      // CORRECTION: Vérifier valide === 0 (non validé)
-      if (r.valide === 1) return;
+    document.getElementById('totalReservations').textContent = reservations.length;
+    document.getElementById('pendingReservations').textContent = reservations.filter(
+      (r) => !r.valide
+    ).length;
 
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <div>
-          <strong>${r.nom}</strong> - ${r.date} 
-          <span class="status">(${r.depart} → ${r.arrivee})</span>
-        </div>
-        <div>
-          <button onclick="validerReservation(${r.id})">Valider</button>
-          <button class="reject" onclick="rejeterReservation(${r.id})">Rejeter</button>
-        </div>
-      `;
-      reservationList.appendChild(li);
-    });
+    const totalRevenue = transactions
+      .filter((t) => t.statut === 'confirmée')
+      .reduce((sum, t) => sum + t.montant, 0);
 
-    transactionList.innerHTML = '';
-    transactions.forEach(t => {
-      const li = document.createElement('li');
-      li.innerHTML = `
-        #${t.id} - Réservation #${t.reservation_id}: 
-        ${t.montant} Ar - ${t.date} - <strong>${t.statut}</strong>
-      `;
-      transactionList.appendChild(li);
-    });
-
+    document.getElementById('totalRevenue').textContent = `${totalRevenue.toLocaleString()} Ar`;
   } catch (err) {
-    alert('Erreur lors du chargement des données: ' + err.message);
+    console.error('Erreur chargement stats:', err);
   }
 }
 
-// Rendre les fonctions globales pour les boutons
-window.validerReservation = validerReservation;
-window.rejeterReservation = rejeterReservation;
+// Fonction pour afficher la liste des réservations dans l’onglet dédié
+async function loadReservationList() {
+  try {
+    const res = await fetch('/api/admin/reservations');
+    const reservations = await res.json();
+    const section = document.getElementById('reservationsSection');
+    section.innerHTML = '';
 
-// On rafraîchit tout au chargement
-refreshData();
+    if (!reservations.length) {
+      section.innerHTML = '<p>Aucune réservation.</p>';
+      return;
+    }
+
+    reservations.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'reservation-card';
+      div.innerHTML = `
+        <strong>${r.nom}</strong> - ${r.depart} → ${r.arrivee} (${r.date})
+        <span style="margin-left:10px;">Statut: ${r.valide ? 'Validée' : 'En attente'}</span>
+      `;
+      section.appendChild(div);
+    });
+  } catch (e) {
+    document.getElementById('reservationsSection').innerHTML = '<p>Erreur de chargement.</p>';
+  }
+}

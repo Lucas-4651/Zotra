@@ -42,6 +42,9 @@ app.use(express.json({ limit: '10kb' }));
 
 // Fichiers statiques publics (non admin)
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/api/admin', require('./routes/admin'));
+
+app.use('/api', require('./routes/annonces'));
 
 // --- PROTECTION ADMIN ---
 // Cette ligne protège TOUT le dossier admin (dashboard, annonces, etc.)

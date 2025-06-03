@@ -37,9 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const url = currentAnnonceId
-        ? `/api/admin/annonces/${currentAnnonceId}`
-        : '/api/admin/annonces';
-
+  ? `/api/annonces/${currentAnnonceId}`
+  : '/api/annonces';
       const method = currentAnnonceId ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -127,9 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const id = annonceItem.dataset.id;
 
     try {
-      const response = await fetch(`/api/admin/annonces/${id}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(`/api/annonces/${id}`, {
+  method: 'DELETE',
+});
 
       if (!response.ok) throw new Error('Erreur de suppression');
 
