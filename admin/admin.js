@@ -1,15 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Gestion de la navigation
+  // Navigation dashboard et onglets
   const navLinks = document.querySelectorAll('nav a');
   const contentSections = document.querySelectorAll('.content-section');
 
   navLinks.forEach((link) => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
-
       navLinks.forEach((l) => l.parentElement.classList.remove('active'));
       link.parentElement.classList.add('active');
-
       const target = link.getAttribute('href').substring(1);
       contentSections.forEach((section) => {
         section.classList.add('hidden');
@@ -23,55 +21,74 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Déconnexion
+  // Déconnexion admin
   document.querySelector('.logout-btn').addEventListener('click', () => {
-    fetch('/admin/logout', {
-      method: 'POST',
-    }).then(() => {
+    fetch('/admin/logout', { method: 'POST' }).then(() => {
       window.location.href = '/admin/login';
     });
   });
 
-  // Charger les données initiales du dashboard principal
+  // Dashboard
   loadDashboardStats();
+  loadStatsChart();
 });
 
-// Fonction pour charger les stats du dashboard principal
+// Statistiques simples
 async function loadDashboardStats() {
   try {
     const [reservations, transactions] = await Promise.all([
       fetch('/api/admin/reservations').then((r) => r.json()),
       fetch('/api/admin/transactions').then((r) => r.json()),
     ]);
-
     document.getElementById('totalReservations').textContent = reservations.length;
-    document.getElementById('pendingReservations').textContent = reservations.filter(
-      (r) => !r.valide
-    ).length;
-
-    const totalRevenue = transactions
-      .filter((t) => t.statut === 'confirmée')
-      .reduce((sum, t) => sum + t.montant, 0);
-
+    document.getElementById('pendingReservations').textContent = reservations.filter(r => !r.valide).length;
+    const totalRevenue = transactions.filter(t => t.statut === 'confirmée').reduce((sum, t) => sum + t.montant, 0);
     document.getElementById('totalRevenue').textContent = `${totalRevenue.toLocaleString()} Ar`;
   } catch (err) {
     console.error('Erreur chargement stats:', err);
   }
 }
 
-// Fonction pour afficher la liste des réservations avec boutons d'action
+// Graphique dynamique avec Chart.js
+async function loadStatsChart() {
+  try {
+    const data = await fetch('/api/admin/stats').then(r => r.json());
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    if (window.dashboardChart) window.dashboardChart.destroy();
+    window.dashboardChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.labels,
+        datasets: [{
+          label: 'Réservations par jour',
+          data: data.reservationsPerDay,
+          backgroundColor: 'rgba(61,104,255,0.4)',
+          borderColor: 'rgba(61,104,255,1)',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  } catch (err) {
+    console.error('Erreur chargement graph:', err);
+  }
+}
+
+// Liste des réservations
 async function loadReservationList() {
   try {
     const res = await fetch('/api/admin/reservations');
     const reservations = await res.json();
     const section = document.getElementById('reservationsSection');
     section.innerHTML = '';
-
     if (!reservations.length) {
       section.innerHTML = '<p>Aucune réservation.</p>';
       return;
     }
-
     reservations.forEach(r => {
       const div = document.createElement('div');
       div.className = 'reservation-card';
@@ -83,7 +100,6 @@ async function loadReservationList() {
           <button class="rejeter-btn" ${r.valide ? 'disabled' : ''}>Rejeter</button>
         </div>
       `;
-      // Actions bouton
       const validerBtn = div.querySelector('.valider-btn');
       validerBtn.addEventListener('click', async () => {
         if (!r.valide) await actionReservation(r.id, 'valider');
@@ -99,7 +115,7 @@ async function loadReservationList() {
   }
 }
 
-// Fonction action Valider/Rejeter réservation
+// Action Valider/Rejeter réservation
 async function actionReservation(id, action) {
   try {
     const endpoint = `/api/admin/reservations/${id}/${action}`;
@@ -108,6 +124,7 @@ async function actionReservation(id, action) {
     if (data.success) {
       loadReservationList();
       loadDashboardStats();
+      loadStatsChart();
     } else {
       alert('Erreur : ' + (data.error || 'Opération échouée'));
     }
@@ -116,7 +133,7 @@ async function actionReservation(id, action) {
   }
 }
 
-// Fonction pour afficher la liste des transactions avec info réservation
+// Liste des transactions
 async function loadTransactionList() {
   try {
     const [transactions, reservations] = await Promise.all([
@@ -125,14 +142,11 @@ async function loadTransactionList() {
     ]);
     const section = document.getElementById('transactionsSection');
     section.innerHTML = '';
-
     if (!transactions.length) {
       section.innerHTML = '<p>Pas de Transaction en ce moment</p>';
       return;
     }
-
     transactions.forEach(t => {
-      // Associe la réservation
       const r = reservations.find(r => r.id === t.reservation_id);
       const div = document.createElement('div');
       div.className = 'transaction-card';

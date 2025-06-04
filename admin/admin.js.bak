@@ -1,89 +1,111 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // Gestion de la navigation
-  const navLinks = document.querySelectorAll('nav a');
-  const contentSections = document.querySelectorAll('.content-section');
-
-  navLinks.forEach((link) => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-
-      // Mettre à jour la navigation active
-      navLinks.forEach((l) => l.parentElement.classList.remove('active'));
-      link.parentElement.classList.add('active');
-
-      // Afficher la section correspondante
-      const target = link.getAttribute('href').substring(1);
-      contentSections.forEach((section) => {
-        section.classList.add('hidden');
-        if (section.id === `${target}Section`) {
-          section.classList.remove('hidden');
-          document.getElementById('pageTitle').textContent = link.textContent.trim();
-          // Charge la liste des réservations à l'ouverture de l'onglet
-          if (section.id === 'reservationsSection') loadReservationList();
-        }
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Zotra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="admin.css" />
+    <!-- Chart.js pour le graphique -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
+      if (!isLoggedIn || isLoggedIn !== 'true') {
+        window.location.href = '/admin/login.html';
+      }
+    </script>
+  </head>
+  <body>
+    <div class="admin-container">
+      <aside class="sidebar">
+        <div class="logo">
+          <i class="fas fa-bus"></i>
+          <h2>Zotra Admin</h2>
+        </div>
+        <nav>
+          <ul>
+            <li class="active">
+              <a href="#dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            </li>
+            <li>
+              <a href="#reservations"><i class="fas fa-ticket-alt"></i> Réservations</a>
+            </li>
+            <li>
+              <a href="#transactions"><i class="fas fa-receipt"></i> Transactions</a>
+            </li>
+            <li>
+              <a href="#annonces"><i class="fas fa-bullhorn"></i> Annonces</a>
+            </li>
+            <li>
+              <a href="#settings"><i class="fas fa-cog"></i> Paramètres</a>
+            </li>
+          </ul>
+        </nav>
+        <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+      </aside>
+      <main class="main-content">
+        <header class="top-bar">
+          <h1 id="pageTitle">Dashboard</h1>
+          <div class="user-info">
+            <span>Admin</span>
+            <i class="fas fa-user-circle"></i>
+          </div>
+        </header>
+        <div class="content-section" id="dashboardSection">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value" id="totalReservations">0</div>
+              <div class="stat-label">Réservations</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="pendingReservations">0</div>
+              <div class="stat-label">En attente</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="totalRevenue">0 Ar</div>
+              <div class="stat-label">Revenue</div>
+            </div>
+          </div>
+          <!-- Ajoute ici le graphique -->
+          <div style="margin-top:30px;">
+            <canvas id="statsChart" height="100"></canvas>
+          </div>
+        </div>
+        <div class="content-section hidden" id="reservationsSection"></div>
+        <div class="content-section hidden" id="transactionsSection"></div>
+        <div class="content-section hidden" id="annoncesSection">
+          <div class="annonces-controls">
+            <button id="addAnnonceBtn" class="btn primary-btn">
+              <i class="fas fa-plus"></i> Nouvelle Annonce
+            </button>
+          </div>
+          <div class="annonces-list" id="annoncesList"></div>
+          <div class="annonce-form hidden" id="annonceForm">
+            <h3><i class="fas fa-edit"></i> <span id="formTitle">Nouvelle Annonce</span></h3>
+            <div class="form-group">
+              <label for="annonceTitre">Titre</label>
+              <input type="text" id="annonceTitre" placeholder="Titre de l'annonce" />
+            </div>
+            <div class="form-group">
+              <label for="annonceContenu">Contenu</label>
+              <textarea id="annonceContenu" rows="5" placeholder="Contenu de l'annonce"></textarea>
+            </div>
+            <div class="form-actions">
+              <button id="saveAnnonceBtn" class="btn primary-btn">Enregistrer</button>
+              <button id="cancelAnnonceBtn" class="btn secondary-btn">Annuler</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="admin.js"></script>
+    <script src="admin-annonces.js"></script>
+    <script>
+      document.querySelector('.logout-btn').addEventListener('click', () => {
+        localStorage.removeItem('isAdminLoggedIn');
+        window.location.href = '/admin/login.html';
       });
-    });
-  });
-
-  // Déconnexion
-  document.querySelector('.logout-btn').addEventListener('click', () => {
-    fetch('/admin/logout', {
-      method: 'POST',
-    }).then(() => {
-      window.location.href = '/admin/login';
-    });
-  });
-
-  // Charger les données initiales du dashboard principal
-  loadDashboardStats();
-});
-
-// Fonction pour charger les stats du dashboard principal
-async function loadDashboardStats() {
-  try {
-    const [reservations, transactions] = await Promise.all([
-      fetch('/api/admin/reservations').then((r) => r.json()),
-      fetch('/api/admin/transactions').then((r) => r.json()),
-    ]);
-
-    document.getElementById('totalReservations').textContent = reservations.length;
-    document.getElementById('pendingReservations').textContent = reservations.filter(
-      (r) => !r.valide
-    ).length;
-
-    const totalRevenue = transactions
-      .filter((t) => t.statut === 'confirmée')
-      .reduce((sum, t) => sum + t.montant, 0);
-
-    document.getElementById('totalRevenue').textContent = `${totalRevenue.toLocaleString()} Ar`;
-  } catch (err) {
-    console.error('Erreur chargement stats:', err);
-  }
-}
-
-// Fonction pour afficher la liste des réservations dans l’onglet dédié
-async function loadReservationList() {
-  try {
-    const res = await fetch('/api/admin/reservations');
-    const reservations = await res.json();
-    const section = document.getElementById('reservationsSection');
-    section.innerHTML = '';
-
-    if (!reservations.length) {
-      section.innerHTML = '<p>Aucune réservation.</p>';
-      return;
-    }
-
-    reservations.forEach(r => {
-      const div = document.createElement('div');
-      div.className = 'reservation-card';
-      div.innerHTML = `
-        <strong>${r.nom}</strong> - ${r.depart} → ${r.arrivee} (${r.date})
-        <span style="margin-left:10px;">Statut: ${r.valide ? 'Validée' : 'En attente'}</span>
-      `;
-      section.appendChild(div);
-    });
-  } catch (e) {
-    document.getElementById('reservationsSection').innerHTML = '<p>Erreur de chargement.</p>';
-  }
-}
+    </script>
+  </body>
+</html>

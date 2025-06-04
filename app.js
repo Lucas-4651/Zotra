@@ -11,7 +11,6 @@ const app = express();
 
 // --- Middleware d'authentification admin ---
 const authAdmin = (req, res, next) => {
-  // Autorise l'accès à /admin/login.html, /admin/login.js, /admin/login GET/POST
   if (
     req.path === '/login.html' ||
     req.path === '/login.js' ||
@@ -19,12 +18,26 @@ const authAdmin = (req, res, next) => {
   ) {
     return next();
   }
-
   if (req.session && req.session.adminAuthenticated) return next();
   return res.redirect('/admin/login');
 };
-// Middlewares globaux
-app.use(helmet());
+
+// --- Helmet avec CSP pour autoriser Chart.js depuis jsdelivr ---
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'", "https:"],
+        scriptSrc: ["'self'", "https:", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+        styleSrc: ["'self'", "https:", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "'unsafe-inline'"],
+        fontSrc: ["'self'", "https:", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com", "data:"],
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'", "https:"],
+        objectSrc: ["'none'"],
+      },
+    },
+  })
+);
 app.use(cookieParser());
 app.use(
   session({
@@ -40,17 +53,17 @@ app.use(
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(express.json({ limit: '10kb' }));
 
-// Fichiers statiques publics (non admin)
+// --- Fichiers statiques publics (non admin) ---
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/admin', require('./routes/admin'));
-
 app.use('/api', require('./routes/annonces'));
 
 // --- PROTECTION ADMIN ---
 // Cette ligne protège TOUT le dossier admin (dashboard, annonces, etc.)
 // sauf /admin/login et ses fichiers
 app.use('/admin', authAdmin, express.static(path.join(__dirname, 'admin')));
-// ROUTES ADMIN LOGIN
+
+// --- ROUTES ADMIN LOGIN ---
 app.get('/admin/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'login.html'));
 });
@@ -76,7 +89,7 @@ app.post('/admin/logout', (req, res) => {
   });
 });
 
-// ROUTE DE RÉSERVATION (exemple, à adapter selon ton besoin)
+// --- ROUTE DE RÉSERVATION ---
 app.post('/reserver', (req, res) => {
   const db = getDb();
   const { nom, numero, depart, arrivee, date } = req.body;
@@ -122,5 +135,5 @@ app.post('/reserver', (req, res) => {
   });
 });
 
-// Démarrage du serveur (dans server.js d’après ton projet)
+// --- EXPORT APP POUR server.js ---
 module.exports = { app };

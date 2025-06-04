@@ -48,4 +48,32 @@ router.post('/reservations/:id/rejeter', (req, res) => {
   });
 });
 
+// Statistiques pour le dashboard (7 derniers jours pour le graphique)
+router.get('/stats', (req, res) => {
+  const db = getDb();
+  const today = new Date();
+  let labels = [];
+  let reservationsPerDay = [];
+  let queries = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const label = `${d.getDate()}/${d.getMonth() + 1}`;
+    labels.push(label);
+    const dateStr = d.toISOString().slice(0, 10);
+    queries.push(new Promise(resolve => {
+      db.get(
+        "SELECT COUNT(*) as count FROM reservations WHERE date = ?",
+        [dateStr],
+        (err, row) => {
+          resolve(row ? row.count : 0);
+        }
+      );
+    }));
+  }
+  Promise.all(queries).then(results => {
+    reservationsPerDay = results;
+    res.json({ labels, reservationsPerDay });
+  });
+});
 module.exports = router;
